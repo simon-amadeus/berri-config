@@ -1,4 +1,5 @@
 # Place in: /usr/lib/systemd/system/librespot.service
+# Hint: Install librespot with cargo and copy binary to /usr/bin/librespot
 
 [Unit]
 Description=Librespot (an open source Spotify client)
