@@ -12,6 +12,17 @@ scp librespot.service "$REMOTE_HOST:/tmp/"
 
 # Deploy and start
 ssh "$REMOTE_HOST" '
+    # Create dedicated librespot user if it doesn'\''t exist
+    if ! id -u librespot >/dev/null 2>&1; then
+        echo "Creating librespot system user..."
+        sudo useradd --system --no-create-home --shell /bin/false \
+                     --groups audio,avahi --comment "Librespot service user" librespot
+    else
+        echo "Librespot user already exists"
+        # Ensure user is in correct groups
+        sudo usermod -a -G audio,avahi librespot
+    fi
+    
     sudo cp /tmp/librespot.service /usr/lib/systemd/system/
     sudo systemctl daemon-reload
     sudo systemctl enable librespot.service
@@ -19,9 +30,9 @@ ssh "$REMOTE_HOST" '
     
     # Basic firewall setup
     if command -v ufw >/dev/null; then
-        sudo ufw allow 22/tcp >/dev/null 2>&1 || true
-        sudo ufw allow 5353/udp >/dev/null 2>&1 || true  
-        sudo ufw allow 36593/tcp >/dev/null 2>&1 || true
+        sudo ufw allow 22/tcp comment "ssh" >/dev/null 2>&1 || true
+        sudo ufw allow 5353/udp comment "mDNS" >/dev/null 2>&1 || true  
+        sudo ufw allow 36593/tcp comment "librespot" >/dev/null 2>&1 || true
     fi
     
     # Status check
