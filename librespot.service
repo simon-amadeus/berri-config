@@ -13,7 +13,7 @@ DynamicUser=yes
 SupplementaryGroups=audio
 Restart=always
 RestartSec=10
-ExecStart=/usr/bin/librespot --name "berri" --bitrate 320 --device "default:CARD=K6" --cache /.librespot_cache --enable-volume-normalisation --initial-volume 25 --volume-ctrl linear --device-type speaker
+ExecStart=/usr/bin/librespot --name "berri" --bitrate 320 --device "default:CARD=K6" --cache /tmp/librespot_cache --enable-volume-normalisation --initial-volume 25 --volume-ctrl linear --device-type speaker --zeroconf-port 36593
 
 [Install]
 WantedBy=multi-user.target
