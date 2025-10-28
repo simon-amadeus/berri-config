@@ -1,6 +1,6 @@
 # Place in: /usr/lib/systemd/system/librespot.service
 # Hint: Install librespot with cargo and copy binary to /usr/bin/librespot
-## cargo build --release --no-default-features --features "rodio-backend with-avahi"
+## cargo install librespot --no-default-features --features "native-tls alsa-backend with-avahi"
 
 [Unit]
 Description=Librespot (an open source Spotify client)
@@ -15,7 +15,7 @@ Group=audio
 SupplementaryGroups=avahi
 Restart=always
 RestartSec=10
-ExecStart=/usr/bin/librespot --name "berri" --bitrate 320 --device "default:CARD=K6" --cache /tmp/librespot_cache --enable-volume-normalisation --initial-volume 25 --volume-ctrl linear --device-type speaker --zeroconf-backend avahi --zeroconf-port 36593
+ExecStart=/usr/bin/librespot --name berri --bitrate 320 --cache /tmp/librespot_cache --enable-volume-normalisation --initial-volume 25 --volume-ctrl linear --device-type speaker --zeroconf-backend avahi --zeroconf-port 36593 --backend alsa --device "default:CARD=K6"
 
 [Install]
 WantedBy=multi-user.target

@@ -8,10 +8,20 @@ LIBRESPOT_PORT=36593
 echo "Deploying librespot to $REMOTE_HOST..."
 
 # Copy service file
+echo "Copying service file..."
 scp librespot.service "$REMOTE_HOST:/tmp/"
 
 # Deploy and start
 ssh "$REMOTE_HOST" '
+    # Install librespot if not already present
+    if ! command -v librespot >/dev/null 2>&1; then
+        echo "Installing librespot..."
+        cargo install librespot --no-default-features --features "native-tls alsa-backend with-avahi"
+        sudo cp ~/.cargo/bin/librespot /usr/bin/librespot
+    else
+        echo "Librespot already installed, skipping installation"
+    fi
+    
     # Create dedicated librespot user if it doesn'\''t exist
     if ! id -u librespot >/dev/null 2>&1; then
         echo "Creating librespot system user..."
@@ -24,12 +34,14 @@ ssh "$REMOTE_HOST" '
     fi
     
     sudo cp /tmp/librespot.service /usr/lib/systemd/system/
+    echo "Configuring systemd service..."
     sudo systemctl daemon-reload
     sudo systemctl enable librespot.service
     sudo systemctl restart librespot.service
     
     # Basic firewall setup
     if command -v ufw >/dev/null; then
+        echo "Configuring firewall..."
         sudo ufw allow 22/tcp comment "ssh" >/dev/null 2>&1 || true
         sudo ufw allow 5353/udp comment "mDNS" >/dev/null 2>&1 || true  
         sudo ufw allow 36593/tcp comment "librespot" >/dev/null 2>&1 || true
